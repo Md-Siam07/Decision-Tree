@@ -1,5 +1,6 @@
 from __future__ import print_function
 from csv import reader
+import math
 
 def load_csv(filename):
 	file = open(filename, "rt")
@@ -52,24 +53,24 @@ def partition(rows, question):
     return true_rows, false_rows
 
 
-def gini(rows):
+def calculateEntropy(rows):
     counts = class_counts(rows)
-    impurity = 1
+    entropy = 0
     for lbl in counts:
         prob_of_lbl = counts[lbl] / float(len(rows))
-        impurity -= prob_of_lbl**2
-    return impurity
+        entropy -= math.log(prob_of_lbl,2)
+    return entropy
 
 
 def info_gain(left, right, current_uncertainty):
     p = float(len(left)) / (len(left) + len(right))
-    return current_uncertainty - p * gini(left) - (1 - p) * gini(right)
+    return current_uncertainty - p * calculateEntropy(left) - (1 - p) * calculateEntropy(right)
 
 
 def find_best_split(rows):
     best_gain = 0 
     best_question = None 
-    current_uncertainty = gini(rows)
+    current_uncertainty = calculateEntropy(rows)
     n_features = len(rows[0]) - 1  
 
     for col in range(n_features): 
@@ -157,13 +158,22 @@ if __name__ == '__main__':
     my_tree = build_tree(training_data)
     
     testing_data = [
-        [13.73, 1.5, 2.7, 22.5, 101, 3, 3.25, 0.29, 2.38, 5.7, 1.19, 2.71, 1285, 1],
-        [14.22, 1.7, 2.3, 16.3, 118, 3.2, 3, 0.26, 2.03, 6.38, 0.94, 3.31, 970, 1],
-        [12.21, 1.19, 1.75, 16.8, 151, 1.85, 1.28, 0.14, 2.5, 2.85, 1.28, 3.07, 718, 2],
-        [11.79, 2.13, 2.78, 28.5, 92, 2.13, 2.24, 0.58, 1.76, 3, 0.97, 2.44, 466, 2],
-        [12.93, 2.81, 2.7, 21, 96, 1.54, 0.5, 0.53, 0.75, 4.6, 0.77, 2.31, 600, 3],
+        [13.75,1.73,2.41,16,89,2.6,2.76,.29,1.81,5.6,1.15,2.9,1320,1],
+        [13.39,1.77,2.62,16.1,93,2.85,2.94,.34,1.45,4.8,.92,3.22,1195,1],
+        [12.29,2.83,2.22,18,88,2.45,2.25,.25,1.99,2.15,1.15,3.3,290,2],
+        [11.45,2.4,2.42,20,96,2.9,2.79,.32,1.83,3.25,.8,3.39,625,2],
+        [14.13,4.1,2.74,24.5,96,2.05,.76,.56,1.35,9.2,.61,1.6,560,3],
     ]
 
+    total_count = 0
+    matched = 0
     for row in testing_data:
+        total_count += 1
         print ("Actual: %s. Predicted: %s" %
                (row[-1], print_leaf(classify(row, my_tree))))
+        classified = classify(row, my_tree)
+        for lbl in classified.keys():
+            if(lbl == row[-1]):
+                matched += 1
+    accuracy = matched / total_count * 100.0
+    print("accuracy : ", accuracy, "%")
