@@ -26,10 +26,6 @@ def class_counts(rows_of_dataset):
         counts[label] += 1
     return counts
 
-def is_numeric(value):
-    return isinstance(value, int) or isinstance(value, float)
-
-
 class Question:
 
     def __init__(self, index, value):
@@ -96,10 +92,7 @@ class Leaf:
 
 class Decision_Node:
 
-    def __init__(self,
-                 question,
-                 true_branch,
-                 false_branch):
+    def __init__(self,question,true_branch,false_branch):
         self.question = question
         self.true_branch = true_branch
         self.false_branch = false_branch
@@ -121,12 +114,12 @@ def print_tree(node, spacing=""):
     if isinstance(node, Leaf):
         print (spacing + "Predict", node.predictions)
         return
-    print (spacing + str(node.question))
+    print (spacing + 'index: ' + str(node.question.index) + ' value: ' + str(node.question.value))
 
-    print (spacing + '--> True:')
+    print (spacing + '--> greater than:')
     print_tree(node.true_branch, spacing + "  ")
 
-    print (spacing + '--> False:')
+    print (spacing + '--> less than:')
     print_tree(node.false_branch, spacing + "  ")
 
 
@@ -210,6 +203,7 @@ if __name__ == '__main__':
         trainData = sum(trainData, [])
         testData = group
         my_tree = build_tree(trainData)
+        print_tree(my_tree, "")
         total_row = 0
         total_matched = 0
         for row in testData:
