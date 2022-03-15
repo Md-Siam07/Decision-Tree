@@ -112,7 +112,7 @@ def build_tree(rows):
 
 def print_tree(node, spacing=""):
     if isinstance(node, Leaf):
-        print (spacing + "Predict", node.predictions)
+        print (spacing + "Node class and count: ", node.predictions)
         return
     print (spacing + 'index: ' + str(node.question.index) + ' value: ' + str(node.question.value))
 
